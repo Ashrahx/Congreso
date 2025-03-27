@@ -1,0 +1,332 @@
+// Pseudocódigo del Sistema de Reservaciones de Restaurante
+// Implementación en formato compatible con PSeInt
+
+Algoritmo SistemaReservacionesRestaurante
+    
+    // Definición de estructuras y variables globales
+    Definir restaurante Como Estructura
+        openingTime: Cadena
+        closingTime: Cadena
+        maxCapacity: Entero
+        tablesAvailable: Entero
+    FinEstructura
+    
+    Definir reservacion Como Estructura
+        id: Entero
+        clientName: Cadena
+        contactNumber: Cadena
+        partySize: Entero
+        date: Cadena
+        time: Cadena
+        status: Cadena
+        createdAt: Cadena
+    FinEstructura
+    
+    Definir reservaciones Como Arreglo De reservacion
+    Definir config Como restaurante
+    Definir opcion Como Entero
+    
+    // Inicialización del sistema
+    config.openingTime <- "10:00"
+    config.closingTime <- "22:00"
+    config.maxCapacity <- 50
+    config.tablesAvailable <- 10
+    
+    CargarReservacionesDesdeAlmacenamiento(reservaciones)
+    
+    // Menú principal
+    Repetir
+        MostrarMenuPrincipal()
+        Leer opcion
+        
+        Segun opcion Hacer
+            1:
+                RegistrarReservacion(reservaciones, config)
+            2:
+                MostrarReservaciones(reservaciones)
+            3:
+                CancelarReservacion(reservaciones)
+            4:
+                Escribir "Saliendo del sistema..."
+            De Otro Modo:
+                Escribir "Opción no válida, intente nuevamente"
+        FinSegun
+        
+    Hasta Que opcion = 4
+    
+FinAlgoritmo
+
+// Subproceso para mostrar el menú principal
+SubProceso MostrarMenuPrincipal()
+    Limpiar Pantalla
+    Escribir "===== SISTEMA DE RESERVACIONES ====="
+    Escribir "1. Nueva Reservación"
+    Escribir "2. Ver Reservaciones"
+    Escribir "3. Cancelar Reservación"
+    Escribir "4. Salir"
+    Escribir "=================================="
+    Escribir "Ingrese una opción: " Sin Saltar
+FinSubProceso
+
+// Subproceso para registrar una nueva reservación
+SubProceso RegistrarReservacion(reservaciones Por Referencia, config)
+    Definir nuevaReservacion Como reservacion
+    Definir confirmacion Como Caracter
+    Definir disponible Como Logico
+    
+    Limpiar Pantalla
+    Escribir "===== NUEVA RESERVACIÓN ====="
+    
+    // Solicitar datos
+    Escribir "Nombre del cliente: " Sin Saltar
+    Leer nuevaReservacion.clientName
+    
+    Escribir "Número de contacto: " Sin Saltar
+    Leer nuevaReservacion.contactNumber
+    
+    Escribir "Cantidad de personas: " Sin Saltar
+    Leer nuevaReservacion.partySize
+    
+    Escribir "Fecha (YYYY-MM-DD): " Sin Saltar
+    Leer nuevaReservacion.date
+    
+    Escribir "Hora (HH:MM): " Sin Saltar
+    Leer nuevaReservacion.time
+    
+    // Validar datos
+    Si No ValidarDatosReservacion(nuevaReservacion, config) Entonces
+        Escribir "Los datos ingresados no son válidos."
+        Escribir "Presione Enter para continuar..."
+        Esperar Tecla
+        Retornar
+    FinSi
+    
+    // Verificar disponibilidad
+    disponible <- VerificarDisponibilidad(reservaciones, nuevaReservacion, config)
+    
+    Si No disponible Entonces
+        Escribir "No hay disponibilidad para la fecha y hora seleccionadas."
+        Escribir "Presione Enter para continuar..."
+        Esperar Tecla
+        Retornar
+    FinSi
+    
+    // Confirmar reservación
+    Escribir "===== CONFIRMAR RESERVACIÓN ====="
+    Escribir "Cliente: ", nuevaReservacion.clientName
+    Escribir "Contacto: ", nuevaReservacion.contactNumber
+    Escribir "Personas: ", nuevaReservacion.partySize
+    Escribir "Fecha: ", nuevaReservacion.date
+    Escribir "Hora: ", nuevaReservacion.time
+    Escribir ""
+    Escribir "¿Confirmar reservación? (S/N): " Sin Saltar
+    Leer confirmacion
+    
+    Si Mayusculas(confirmacion) = "S" Entonces
+        // Generar ID único basado en timestamp
+        nuevaReservacion.id <- ObtenerTimestamp()
+        nuevaReservacion.status <- "active"
+        nuevaReservacion.createdAt <- ObtenerFechaHoraActual()
+        
+        // Agregar a la lista
+        reservaciones[Longitud(reservaciones) + 1] <- nuevaReservacion
+        GuardarReservacionesEnAlmacenamiento(reservaciones)
+        
+        Escribir "Reservación registrada exitosamente."
+    Sino
+        Escribir "Reservación cancelada."
+    FinSi
+    
+    Escribir "Presione Enter para continuar..."
+    Esperar Tecla
+FinSubProceso
+
+// Subproceso para mostrar reservaciones existentes
+SubProceso MostrarReservaciones(reservaciones)
+    Definir filtro Como Caracter
+    Definir i Como Entero
+    Definir hayReservaciones Como Logico
+    
+    Limpiar Pantalla
+    Escribir "===== RESERVACIONES EXISTENTES ====="
+    
+    // Solicitar filtros
+    Escribir "Filtro (todas/activas/canceladas): " Sin Saltar
+    Leer filtro
+    filtro <- Minusculas(filtro)
+    
+    hayReservaciones <- Falso
+    
+    // Mostrar reservaciones según filtro
+    Para i <- 1 Hasta Longitud(reservaciones) Con Paso 1 Hacer
+        Si filtro = "todas" O (filtro = "activas" Y reservaciones[i].status = "active") O (filtro = "canceladas" Y reservaciones[i].status = "cancelled") Entonces
+            Escribir "ID: ", reservaciones[i].id
+            Escribir "Cliente: ", reservaciones[i].clientName
+            Escribir "Personas: ", reservaciones[i].partySize
+            Escribir "Fecha y hora: ", reservaciones[i].date, " ", reservaciones[i].time
+            Escribir "Estado: ", reservaciones[i].status
+            Escribir "--------------------------------"
+            hayReservaciones <- Verdadero
+        FinSi
+    FinPara
+    
+    Si No hayReservaciones Entonces
+        Escribir "No hay reservaciones para mostrar."
+    FinSi
+    
+    Escribir "Presione Enter para continuar..."
+    Esperar Tecla
+FinSubProceso
+
+// Subproceso para cancelar una reservación
+SubProceso CancelarReservacion(reservaciones Por Referencia)
+    Definir idBuscado Como Entero
+    Definir encontrado Como Logico
+    Definir i Como Entero
+    Definir confirmacion Como Caracter
+    
+    Limpiar Pantalla
+    Escribir "===== CANCELAR RESERVACIÓN ====="
+    
+    Escribir "Ingrese el ID de la reservación a cancelar: " Sin Saltar
+    Leer idBuscado
+    
+    encontrado <- Falso
+    
+    // Buscar la reservación
+    Para i <- 1 Hasta Longitud(reservaciones) Con Paso 1 Hacer
+        Si reservaciones[i].id = idBuscado Y reservaciones[i].status = "active" Entonces
+            encontrado <- Verdadero
+            
+            Escribir "===== DETALLES DE RESERVACIÓN ====="
+            Escribir "Cliente: ", reservaciones[i].clientName
+            Escribir "Contacto: ", reservaciones[i].contactNumber
+            Escribir "Personas: ", reservaciones[i].partySize
+            Escribir "Fecha: ", reservaciones[i].date
+            Escribir "Hora: ", reservaciones[i].time
+            Escribir "Estado: ", reservaciones[i].status
+            
+            Escribir ""
+            Escribir "¿Confirmar cancelación? (S/N): " Sin Saltar
+            Leer confirmacion
+            
+            Si Mayusculas(confirmacion) = "S" Entonces
+                reservaciones[i].status <- "cancelled"
+                GuardarReservacionesEnAlmacenamiento(reservaciones)
+                Escribir "Reservación cancelada exitosamente."
+            Sino
+                Escribir "Operación abortada."
+            FinSi
+        FinSi
+    FinPara
+    
+    Si No encontrado Entonces
+        Escribir "No se encontró una reservación activa con el ID especificado."
+    FinSi
+    
+    Escribir "Presione Enter para continuar..."
+    Esperar Tecla
+FinSubProceso
+
+// Subproceso para validar los datos de una reservación
+Funcion valido <- ValidarDatosReservacion(reservacion, config) 
+    Definir valido Como Logico
+    
+    valido <- Verdadero
+    
+    // Validar nombre del cliente (mínimo 3 caracteres)
+    Si Longitud(reservacion.clientName) < 3 Entonces
+        Escribir "Error: El nombre del cliente debe tener al menos 3 caracteres."
+        valido <- Falso
+    FinSi
+    
+    // Validar número de contacto (mínimo 8 dígitos)
+    Si Longitud(reservacion.contactNumber) < 8 Entonces
+        Escribir "Error: El número de contacto debe tener al menos 8 dígitos."
+        valido <- Falso
+    FinSi
+    
+    // Validar cantidad de personas
+    Si reservacion.partySize < 1 O reservacion.partySize > 20 Entonces
+        Escribir "Error: La cantidad de personas debe estar entre 1 y 20."
+        valido <- Falso
+    FinSi
+    
+    // Validar fecha (formato y que no sea anterior a hoy)
+    Si No ValidarFormatoFecha(reservacion.date) O FechaAnteriorAHoy(reservacion.date) Entonces
+        Escribir "Error: La fecha debe tener formato YYYY-MM-DD y no puede ser anterior a hoy."
+        valido <- Falso
+    FinSi
+    
+    // Validar hora (formato y dentro del horario de operación)
+    Si No ValidarFormatoHora(reservacion.time) O No HoraDentroDeOperacion(reservacion.time, config.openingTime, config.closingTime) Entonces
+        Escribir "Error: La hora debe tener formato HH:MM y estar dentro del horario de operación."
+        Escribir "Horario de operación: ", config.openingTime, " a ", config.closingTime
+        valido <- Falso
+    FinSi
+    
+    Retornar valido
+FinFuncion
+
+// Subproceso para verificar disponibilidad
+Funcion disponible <- VerificarDisponibilidad(reservaciones, nuevaReservacion, config)
+    Definir disponible Como Logico
+    Definir personasEnMismoHorario Como Entero
+    Definir i Como Entero
+    
+    personasEnMismoHorario <- 0
+    
+    // Contar personas en reservaciones activas en el mismo horario (±30 minutos)
+    Para i <- 1 Hasta Longitud(reservaciones) Con Paso 1 Hacer
+        Si reservaciones[i].status = "active" Y reservaciones[i].date = nuevaReservacion.date Y 
+           DiferenciaMinutos(reservaciones[i].time, nuevaReservacion.time) <= 30 Entonces
+            personasEnMismoHorario <- personasEnMismoHorario + reservaciones[i].partySize
+        FinSi
+    FinPara
+    
+    // Verificar si hay capacidad disponible
+    disponible <- (personasEnMismoHorario + nuevaReservacion.partySize) <= config.maxCapacity
+    
+    Retornar disponible
+FinFuncion
+
+// Funciones auxiliares (implementación simplificada)
+Funcion timestamp <- ObtenerTimestamp()
+    timestamp <- 100000 + Aleatorio(1, 900000)  // Simulación simple de timestamp único
+FinFuncion
+
+Funcion fechaHora <- ObtenerFechaHoraActual()
+    fechaHora <- "2023-01-01 12:00:00"  // En un sistema real, se obtendría la fecha y hora del sistema
+FinFuncion
+
+Funcion valido <- ValidarFormatoFecha(fecha)
+    valido <- Longitud(fecha) = 10  // Simplificación; en un sistema real se verificaría el formato YYYY-MM-DD
+FinFuncion
+
+Funcion anterior <- FechaAnteriorAHoy(fecha)
+    anterior <- Falso  // Simplificación; en un sistema real se compararía con la fecha actual
+FinFuncion
+
+Funcion valido <- ValidarFormatoHora(hora)
+    valido <- Longitud(hora) = 5  // Simplificación; en un sistema real se verificaría el formato HH:MM
+FinFuncion
+
+Funcion dentroDe <- HoraDentroDeOperacion(hora, apertura, cierre)
+    dentroDe <- hora >= apertura Y hora <= cierre  // Simplificación de comparación de horas
+FinFuncion
+
+Funcion diferencia <- DiferenciaMinutos(hora1, hora2)
+    // Simplificación; en un sistema real se calcularía la diferencia en minutos entre dos horas
+    diferencia <- 15  // Valor fijo para simplificar
+FinFuncion
+
+// Funciones para persistencia de datos (simuladas)
+SubProceso CargarReservacionesDesdeAlmacenamiento(reservaciones Por Referencia)
+    // En un sistema real, se cargarían desde un archivo o base de datos
+    // Esta es una implementación simulada
+FinSubProceso
+
+SubProceso GuardarReservacionesEnAlmacenamiento(reservaciones)
+    // En un sistema real, se guardarían en un archivo o base de datos
+    // Esta es una implementación simulada
+FinSubProceso
