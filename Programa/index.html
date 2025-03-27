@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Reservaciones - Restaurante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-indigo-700 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Restaurante El Buen Sabor</h1>
+            <p class="text-sm">Sistema de Reservaciones</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 mt-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Formulario de Reservación -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-700">Nueva Reservación</h2>
+                <form id="reservation-form" class="space-y-4">
+                    <div>
+                        <label for="client-name" class="block text-gray-700">Nombre del Cliente:</label>
+                        <input type="text" id="client-name" name="client-name" required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="contact-number" class="block text-gray-700">Número de Contacto:</label>
+                        <input type="tel" id="contact-number" name="contact-number" required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="party-size" class="block text-gray-700">Número de Personas:</label>
+                        <input type="number" id="party-size" name="party-size" min="1" max="20" required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="reservation-date" class="block text-gray-700">Fecha:</label>
+                        <input type="date" id="reservation-date" name="reservation-date" required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="reservation-time" class="block text-gray-700">Hora:</label>
+                        <input type="time" id="reservation-time" name="reservation-time" required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <button type="submit" 
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            Verificar Disponibilidad
+                        </button>
+                        <button type="reset" 
+                            class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Modal de Confirmación -->
+                <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                        <h3 class="text-lg font-semibold mb-4">Confirmar Reservación</h3>
+                        <div id="confirmation-details" class="mb-4">
+                            <!-- Detalles de reservación -->
+                        </div>
+                        <div class="flex space-x-4">
+                            <button id="confirm-reservation" 
+                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                Confirmar
+                            </button>
+                            <button id="cancel-confirmation" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Reservaciones -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-indigo-700">Reservaciones Existentes</h2>
+                    <div class="flex space-x-2">
+                        <button id="refresh-list" 
+                            class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 text-sm">
+                            Actualizar
+                        </button>
+                        <select id="filter-status" 
+                            class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">Todas</option>
+                            <option value="active">Activas</option>
+                            <option value="cancelled">Canceladas</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personas</th>
+                                <th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
+                                <th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservations-list" class="divide-y divide-gray-200">
+                            <!-- Las reservaciones se cargarán aquí dinámicamente -->
+                            <tr class="text-gray-400 italic">
+                                <td colspan="5" class="py-4 px-3 text-center">Cargando reservaciones...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Cancelación -->
+    <div id="cancel-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 class="text-lg font-semibold mb-4">Cancelar Reservación</h3>
+            <p class="mb-4">¿Está seguro que desea cancelar la siguiente reservación?</p>
+            <div id="cancel-details" class="mb-4 p-3 bg-gray-100 rounded-md">
+                <!-- Detalles de reservación a cancelar -->
+            </div>
+            <div class="flex space-x-4">
+                <button id="confirm-cancellation" data-id=""
+                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    Sí, Cancelar
+                </button>
+                <button id="abort-cancellation"
+                    class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    No, Mantener
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/validation.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

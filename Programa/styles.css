@@ -1,0 +1,29 @@
+/* Estilos personalizados adicionales a Tailwind */
+
+/* Animación para alertas */
+.alert-animation {
+    animation: fadeIn 0.3s, fadeOut 0.5s 2.5s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Estilo para reservaciones canceladas */
+.cancelled-reservation {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Mejoras para dispositivos móviles */
+@media (max-width: 640px) {
+    .table-container {
+        overflow-x: auto;
+    }
+}
