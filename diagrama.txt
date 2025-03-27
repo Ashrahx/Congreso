@@ -1,0 +1,91 @@
+// Diagrama de Flujo principal del Sistema de Reservaciones
+// Representación textual del diagrama de flujo para implementación en PSeInt
+
+Inicio
+    |
+    +--> Inicializar Sistema
+    |       |
+    |       +--> Cargar Configuración del Restaurante
+    |       |
+    |       +--> Cargar Reservaciones Existentes
+    |
+    +--> Mostrar Menú Principal
+            |
+            +--> [1] Nueva Reservación --> Proceso: RegistrarReservacion
+            |
+            +--> [2] Ver Reservaciones --> Proceso: MostrarReservaciones
+            |
+            +--> [3] Cancelar Reservación --> Proceso: CancelarReservacion
+            |
+            +--> [4] Salir --> Finalizar Programa
+
+// Proceso: RegistrarReservacion
+Inicio RegistrarReservacion
+    |
+    +--> Solicitar datos de la reservación:
+    |       - Nombre del cliente
+    |       - Número de contacto
+    |       - Cantidad de personas
+    |       - Fecha y hora
+    |
+    +--> Validar datos ingresados
+    |       |
+    |       +--> ¿Datos válidos?
+    |               |
+    |               +--> [No] --> Mostrar mensaje de error --> Volver a solicitar datos
+    |               |
+    |               +--> [Sí] --> Continuar
+    |
+    +--> Verificar disponibilidad
+            |
+            +--> ¿Hay disponibilidad?
+                    |
+                    +--> [No] --> Mostrar mensaje "No hay disponibilidad" --> Regresar al Menú Principal
+                    |
+                    +--> [Sí] --> Mostrar confirmación de datos
+                                   |
+                                   +--> ¿Confirmar reservación?
+                                           |
+                                           +--> [No] --> Cancelar y volver al Menú Principal
+                                           |
+                                           +--> [Sí] --> Guardar Reservación --> Mostrar mensaje de éxito --> Volver al Menú Principal
+
+// Proceso: MostrarReservaciones
+Inicio MostrarReservaciones
+    |
+    +--> Solicitar filtros (opcional)
+    |       - Estado (Todas, Activas, Canceladas)
+    |       - Fecha
+    |
+    +--> Obtener reservaciones según filtros
+    |
+    +--> ¿Existen reservaciones?
+            |
+            +--> [No] --> Mostrar mensaje "No hay reservaciones" --> Volver al Menú Principal
+            |
+            +--> [Sí] --> Mostrar lista de reservaciones
+                           |
+                           +--> Opciones:
+                                   |
+                                   +--> [1] Ver detalles --> Mostrar detalles de la reservación seleccionada
+                                   |
+                                   +--> [2] Volver al Menú Principal
+
+// Proceso: CancelarReservacion
+Inicio CancelarReservacion
+    |
+    +--> Solicitar identificador de la reservación (ID o nombre del cliente)
+    |
+    +--> Buscar reservación
+    |
+    +--> ¿Reservación encontrada?
+            |
+            +--> [No] --> Mostrar mensaje "Reservación no encontrada" --> Volver al Menú Principal
+            |
+            +--> [Sí] --> Mostrar detalles de la reservación
+                           |
+                           +--> ¿Confirmar cancelación?
+                                   |
+                                   +--> [No] --> Abortar y volver al Menú Principal
+                                   |
+                                   +--> [Sí] --> Cambiar estado a "Cancelada" --> Mostrar mensaje de éxito --> Volver al Menú Principal
